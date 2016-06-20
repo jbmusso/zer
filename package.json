@@ -1,0 +1,34 @@
+{
+  "name": "zer",
+  "version": "0.0.0",
+  "description": "Generate Gremlin queries by chaining JavaScript function calls",
+  "main": "lib/index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-preset-node6": "^11.0.0",
+    "babel-preset-stage-2": "^6.5.0",
+    "babel-register": "^6.9.0",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
+  },
+  "scripts": {
+    "test": "mocha $(find src -path '*test.js') --compilers js:babel-register --recursive --reporter spec",
+    "test:watch": "npm run test -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "effrqzfzef"
+  },
+  "keywords": [
+    "gremlin",
+    "tinkerpop",
+    "graphdb",
+    "graph",
+    "database",
+    "dsl",
+    "proxy",
+    "generate"
+  ],
+  "author": "Jean-Baptiste Musso <jbmusso+github@gmail.com>",
+  "license": "MIT"
+}
