@@ -5,13 +5,18 @@
   "main": "lib/index.js",
   "dependencies": {},
   "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-loader": "^6.2.4",
     "babel-preset-node6": "^11.0.0",
     "babel-preset-stage-2": "^6.5.0",
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "webpack": "^1.13.1"
   },
   "scripts": {
+    "build": "babel ./src -d lib",
+    "build:watch": "npm run build -- --watch",
     "test": "mocha $(find src -path '*test.js') --compilers js:babel-register --recursive --reporter spec",
     "test:watch": "npm run test -- --watch"
   },
