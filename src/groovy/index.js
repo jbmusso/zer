@@ -57,7 +57,7 @@ const GROOVY_BUILDER_ESCAPED = {
 
 
   STRINGIFY_ARGUMENT(paramValue, nameIdentifier, boundAcc) {
-    // If Argument is a Chain, that chained need to be escaped recursively
+    // If Argument is a Chain, that chain needs to be escaped recursively
     // then merged back into the parent chain.
     if (paramValue instanceof Chain) {
       return toBoundGroovy(paramValue, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
