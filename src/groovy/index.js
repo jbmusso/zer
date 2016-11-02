@@ -27,12 +27,12 @@ const stringifyArgument = (argument) => {
 }
 
 
-const GROOVY_BUILDER_INLINED = {
+const GROOVY = {
   CHAIN_START(member) {
     return member.name;
   },
 
-  PROPERTY(member) {
+  STEP(member) {
     return `.${member.name}`
   },
 
@@ -42,90 +42,12 @@ const GROOVY_BUILDER_INLINED = {
 }
 
 
-const GROOVY_BUILDER_ESCAPED = {
-  CHAIN_START(member) {
-    return {
-      query: member.name
-    };
-  },
-
-  PROPERTY(member) {
-    return {
-      query: `.${member.name}`
-    }
-  },
-
-
-  STRINGIFY_ARGUMENT(paramValue, nameIdentifier, boundAcc) {
-    // If Argument is a Chain, that chain needs to be escaped recursively
-    // then merged back into the parent chain.
-    if (paramValue instanceof Chain) {
-      return toBoundGroovy(paramValue, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
-    }
-
-    // Argument is a Primitive and can be safely escaped/bound.
-    // Let's generate the next bound param identifier.
-    const paramKey = nameIdentifier(boundAcc.offset);
-    boundAcc.offset += 1;
-
-    // Return the intermediate query
-    return {
-      query: paramKey,
-      params: {
-        [paramKey]: paramValue
-      },
-      offset: boundAcc.offset
-    };
-  },
-
-  ARGUMENTS(chainMember, nameIdentifier, boundAcc) {
-    const boundParams = _(chainMember.params)
-      .map((paramValue) => this.STRINGIFY_ARGUMENT(paramValue, nameIdentifier, boundAcc))
-      .reduce((acc, { query = '', params, offset }) => {
-        acc.inline.push(query);
-        acc.params = {
-          ...acc.params,
-          ...params
-        };
-
-        return acc;
-      }, { inline: [], params: {} });
-
-    return {
-      query: `(${boundParams.inline.join(GROOVY_FORMAT_NORMAL.ARGUMENT_SEPARATOR)})`,
-      params: boundParams.params,
-      offset: boundAcc.offset
-    }
-  }
-}
-
-export const toGroovy = ({ members }) => {
+export function toGroovy({ members }) {
   return members
-    .map((member) => GROOVY_BUILDER_INLINED[member.type](member))
+    .map((member) => GROOVY[member.type](member))
     .join('');
 }
 
-export const toBoundGroovy = (chain, nameIdentifier = (offset) => `p${offset}`, boundAcc = { query: '', params: {}, offset: 0 } ) => {
+const groovy = createChainCreator(STRATEGY, toGroovy);
 
-  return chain.members.reduce((current, member) => {
-    const {
-      query = '',
-      params = {},
-      offset = current.offset
-    } = GROOVY_BUILDER_ESCAPED[member.type](member, nameIdentifier, current);
-
-    current.query += query;
-    current.params = {
-      ...current.params,
-      ...params
-    }
-    current.offset = offset;
-
-    return current;
-  }, boundAcc);
-}
-
-export const Steps = createChainCreator(STRATEGY, toGroovy);
-
-export const Objects = createChainCreator(STRATEGY, toGroovy);
-
+export default groovy;

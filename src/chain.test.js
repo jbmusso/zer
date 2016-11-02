@@ -10,7 +10,7 @@ describe('Chain', () => {
   });
 
   it('should add start step', () => {
-    const chain = createChain('foo');
+    const chain = createChain().startWith('foo');
 
     assert.property(chain, 'members');
     assert.lengthOf(chain.members, 1);
@@ -18,8 +18,9 @@ describe('Chain', () => {
   });
 
   it('should chain steps', () => {
-    const chain = createChain('foo')
-      .addProperty('bar')
+    const chain = createChain()
+      .addStep('foo')
+      .addStep('bar')
 
     assert.lengthOf(chain.members, 2);
     assert.deepPropertyVal(chain, 'members.0.name', 'foo');
@@ -28,8 +29,9 @@ describe('Chain', () => {
   });
 
   it('should chain arguments', () => {
-    const chain = createChain('foo')
-      .addProperty('bar')
+    const chain = createChain()
+      .addStep('foo')
+      .addStep('bar')
       .addArguments('name', 'Alice');
 
     assert.lengthOf(chain.members, 3);

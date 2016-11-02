@@ -1,23 +1,67 @@
-export const createChainCreator = (strategy, render) => {
+export function createChainCreator(strategy, render) {
   // This Proxy initiates the chain, and must return a new Chain
   const handler = {
     get(target, name, receiver) {
-      const chain = strategy.init(name);
-      return createMemberChainer(chain, strategy, render);
-    },
+      return createChain(name, strategy, render);
+    }
   };
 
-  return new Proxy(() => {}, handler);
+  return new Proxy({}, handler);
 };
 
+const NO_INTERCEPT = [
+  'constructor',
+  'toString',
+  'inspect',
+  'nodeType',
+  Symbol.toStringTag
+];
 
-const createMemberChainer = (chain, strategy, render) => {
-  const proxy = new Proxy(() => chain, {
+function createChain(chainName, strategy, render) {
+  return new Proxy(() => {}, {
+    get(target, name) {
+      if (name === 'toString') {
+        return () => chainName
+      }
+
+      if (NO_INTERCEPT.includes(name)) {
+        return target[name];
+      }
+
+      const chain = strategy
+        .init()
+        .startWith(chainName)
+
+      const chainer = createMemberChainer(chain, strategy, render);
+
+      chainer[name];
+
+      return chainer;
+    },
+
+    apply(target, thisArg, args) {
+      const chain = strategy
+        .init()
+        .startWith(chainName);
+
+      strategy.addArguments(chain, ...args);
+
+      const chainer = createMemberChainer(chain, strategy, render);
+
+      return chainer;
+    },
+  });
+}
+
+export function createMemberChainer(chain, strategy, render) {
+  const chainProxy = new Proxy(() => chain, {
     get(target, name, receiver) {
+
       if (name === 'name') {
         // KEEP ??? Maybe not
         // TODO: less dirty (ensure proper return value)
         return {}
+        // return target[name];
       }
 
       if (name === 'toString') {
@@ -61,16 +105,16 @@ const createMemberChainer = (chain, strategy, render) => {
         return {}
       }
 
-      strategy.get(chain, name)
+      strategy.addStep(chain, name);
 
       return receiver;
     },
 
     apply(target, thisArg, args) {
-      strategy.apply(chain, ...args);
-      return proxy;
+      strategy.addArguments(chain, ...args);
+      return chainProxy;
     }
   });
 
-  return proxy;
+  return chainProxy;
 };

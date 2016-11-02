@@ -8,10 +8,10 @@ class ChainStart {
   }
 }
 
-class Property {
+class Step {
   constructor(name) {
     this.name = name;
-    this.type = 'PROPERTY';
+    this.type = 'STEP';
   }
 }
 
@@ -32,8 +32,8 @@ export class Chain {
     return this;
   }
 
-  addProperty(name) {
-    this.members.push(new Property(name));
+  addStep(name) {
+    this.members.push(new Step(name));
     return this;
   }
 
@@ -47,11 +47,8 @@ export class Chain {
   }
 }
 
-export const createChain = (name) => {
-  const chain = new Chain();
-  chain.startWith(name);
-
-  return chain;
+export function createChain() {
+  return new Chain();
 }
 
 export const STRATEGY = {
@@ -59,11 +56,11 @@ export const STRATEGY = {
     return createChain(name);
   },
 
-  get(chain, name) {
-    chain.addProperty(name)
+  addStep(chain, name) {
+    chain.addStep(name)
   },
 
-  apply(chain, ...args) {
+  addArguments(chain, ...args) {
     chain.addArguments(...args)
   }
 }
