@@ -12,14 +12,20 @@
     "babel-register": "^6.9.0",
     "chai": "^3.5.0",
     "mocha": "^2.4.5",
+    "rimraf": "^2.5.4",
     "webpack": "^1.13.1"
   },
   "scripts": {
-    "build": "babel ./src -d lib",
+    "prebuild": "rimraf lib",
+    "build": "babel -d lib --ignore *.test.js src",
     "build:watch": "npm run build -- --watch",
     "test": "mocha $(find src -path '*test.js') --compilers js:babel-register --recursive --reporter spec",
     "test:watch": "npm run test -- --watch"
   },
+  "files": [
+    "README.md",
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "effrqzfzef"
