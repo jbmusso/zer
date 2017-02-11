@@ -1,8 +1,8 @@
-export function createChainCreator(strategy, render) {
+export function createChainCreator(chainFactory, render) {
   // This Proxy initiates the chain, and must return a new Chain
   const handler = {
     get(target, name, receiver) {
-      return createChain(name, strategy, render);
+      return createChain(name, chainFactory, render);
     }
   };
 
@@ -17,7 +17,7 @@ const NO_INTERCEPT = [
   Symbol.toStringTag
 ];
 
-function createChain(chainName, strategy, render) {
+function createChain(chainName, chainFactory, render) {
   return new Proxy(() => {}, {
     get(target, name) {
       if (name === 'toString') {
@@ -27,12 +27,11 @@ function createChain(chainName, strategy, render) {
       if (NO_INTERCEPT.includes(name)) {
         return target[name];
       }
-
-      const chain = strategy
-        .init()
+      
+      const chain = chainFactory()
         .startWith(chainName)
 
-      const chainer = createMemberChainer(chain, strategy, render);
+      const chainer = createMemberChainer(chain, render);
 
       chainer[name];
 
@@ -40,20 +39,19 @@ function createChain(chainName, strategy, render) {
     },
 
     apply(target, thisArg, args) {
-      const chain = strategy
-        .init()
+      const chain = chainFactory()
         .startWith(chainName);
 
-      strategy.addArguments(chain, ...args);
+      chain.addArguments(...args);
 
-      const chainer = createMemberChainer(chain, strategy, render);
+      const chainer = createMemberChainer(chain, render);
 
       return chainer;
     },
   });
 }
 
-export function createMemberChainer(chain, strategy, render) {
+export function createMemberChainer(chain, render) {
   const chainProxy = new Proxy(() => chain, {
     get(target, name, receiver) {
 
@@ -105,13 +103,14 @@ export function createMemberChainer(chain, strategy, render) {
         return {}
       }
 
-      strategy.addStep(chain, name);
+      chain.addStep(name);
 
       return receiver;
     },
 
     apply(target, thisArg, args) {
-      strategy.addArguments(chain, ...args);
+      chain.addArguments(...args);
+
       return chainProxy;
     }
   });

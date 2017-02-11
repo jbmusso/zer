@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { createChainCreator } from '../factories';
-import { STRATEGY, Chain } from '../chain';
+import { createChain, Chain } from '../chain';
 
 
 const GROOVY_FORMAT_NORMAL = {
@@ -99,6 +99,6 @@ export function toBoundGroovy(chain, nameIdentifier = (offset) => `p${offset}`, 
   }, boundAcc);
 }
 
-const gremlin = createChainCreator(STRATEGY, toBoundGroovy);
+const gremlin = createChainCreator(createChain, toBoundGroovy);
 
 export default gremlin;

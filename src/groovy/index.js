@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { createChainCreator } from '../';
-import { Chain, STRATEGY } from '../chain';
+import { Chain, createChain } from '../chain';
 
 
 const GROOVY_FORMAT_NORMAL = {
@@ -48,6 +48,6 @@ export function toGroovy({ members }) {
     .join('');
 }
 
-const groovy = createChainCreator(STRATEGY, toGroovy);
+const groovy = createChainCreator(createChain, toGroovy);
 
 export default groovy;

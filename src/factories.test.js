@@ -3,11 +3,11 @@ import { assert } from 'chai';
 import { createChainCreator } from './';
 
 import { toGroovy } from './groovy';
-import { STRATEGY } from './chain';
+import { createChain } from './chain';
 
 
-const Objects = createChainCreator(STRATEGY, toGroovy);
-const Steps = createChainCreator(STRATEGY, toGroovy);
+const Objects = createChainCreator(createChain, toGroovy);
+const Steps = createChainCreator(createChain, toGroovy);
 
 
 describe('Steps', () => {
