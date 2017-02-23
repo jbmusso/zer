@@ -47,20 +47,7 @@ export class Chain {
   }
 }
 
+// TODO: missing name argument here?
 export function createChain() {
   return new Chain();
-}
-
-export const STRATEGY = {
-  init(name) {
-    return createChain(name);
-  },
-
-  addStep(chain, name) {
-    chain.addStep(name)
-  },
-
-  addArguments(chain, ...args) {
-    chain.addArguments(...args)
-  }
 }
