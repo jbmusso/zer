@@ -39,7 +39,11 @@
     "database",
     "dsl",
     "proxy",
-    "generate"
+    "generate",
+    "serializer",
+    "serialization",
+    "sql",
+    "groovy"
   ],
   "author": "Jean-Baptiste Musso <jbmusso+github@gmail.com>",
   "license": "MIT"
