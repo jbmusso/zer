@@ -1,3 +1,6 @@
+import util from 'util';
+
+
 export function createChainCreator(chainFactory, render) {
   // This Proxy initiates the chain, and must return a new Chain
   const handler = {
@@ -53,23 +56,16 @@ function createChain(chainName, chainFactory, render) {
 
 function createHandler(chain, methodName, render) {
   const handlers = {
-    name() {
-      return {};
-    },
     toString() {
       return () => render(chain)
     },
-    inspect() {
-      return {};
+    // Called with console.log(chain) -- single arg
+    [util.inspect.custom]() {
+      return () => 'Chain: ' + util.inspect(render(chain))
     },
-    valueOf() {
-      return () => render(chain)
-    },
+    // Called with console.log('arg', chain) -- multiple args
     [Symbol.toPrimitive]() {
-      return () => render(chain)
-    },
-    [Symbol.toStringTag]() {
-      return {}
+      return () => 'Chain: '+ util.inspect(render(chain));
     },
     __repr__() {
       return () => chain.members;
