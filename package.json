@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "description": "Generate Gremlin queries by chaining JavaScript function calls",
   "main": "lib/index.js",
-  "dependencies": {},
+  "dependencies": {
+    "postinstall-build": "^2.1.3"
+  },
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "babel-loader": "^6.2.4",
-    "babel-preset-node6": "^11.0.0",
-    "babel-preset-stage-2": "^6.5.0",
-    "babel-register": "^6.9.0",
+    "babel-cli": "^6.23.0",
+    "babel-loader": "^6.3.2",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.1.8",
     "chai": "^3.5.0",
     "mocha": "^2.4.5",
     "rimraf": "^2.5.4",
