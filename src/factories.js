@@ -51,56 +51,42 @@ function createChain(chainName, chainFactory, render) {
   });
 }
 
+function createHandler(chain, methodName, render) {
+  const handlers = {
+    name() {
+      return {};
+    },
+    toString() {
+      return () => render(chain)
+    },
+    inspect() {
+      return {};
+    },
+    valueOf() {
+      return () => render(chain)
+    },
+    [Symbol.toPrimitive]() {
+      return () => render(chain)
+    },
+    [Symbol.toStringTag]() {
+      return {}
+    },
+    __repr__() {
+      return () => chain.members;
+    }
+  }
+
+  return handlers[methodName];
+}
+
+
 export function createMemberChainer(chain, render) {
   const chainProxy = new Proxy(() => chain, {
     get(target, name, receiver) {
+      const handler = createHandler(chain, name, render);
 
-      if (name === 'name') {
-        // KEEP ??? Maybe not
-        // TODO: less dirty (ensure proper return value)
-        return {}
-        // return target[name];
-      }
-
-      if (name === 'toString') {
-        // KEEP
-        // TODO: less dirty (ensure proper return value)
-        return () => {
-          return render(chain);
-        };
-      }
-
-      if (name === '__repr__') {
-        return () => {
-          return chain.members
-        };
-      }
-
-      if (name === 'inspect') {
-        // KEEP
-        // TODO: less dirty (ensure proper return value)
-        return {};
-      }
-
-      if (name === 'valueOf') {
-        // KEEP
-        return () => {
-          return render(chain);
-        }
-      }
-
-      if (name === Symbol.toPrimitive) {
-        // KEEP
-        return () => {
-          // TODO: improve string representation
-          return render(chain);
-        };
-      }
-
-      if (name === Symbol.toStringTag) {
-        // KEEP
-        // TODO: less dirty (ensure proper return value)
-        return {}
+      if (handler) {
+        return handler();
       }
 
       chain.addStep(name);
