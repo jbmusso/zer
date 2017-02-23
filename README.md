@@ -29,7 +29,9 @@ console.log(chain.__repr__());
 // g.V().has('name', 'Alice').repeat(out('knows')).until(has('name', 'Bob'))
 ```
 
-Zer supports allows you to output Objects, not just Strings. This is especially useful when you wish to escape some arguments from your chain, such as when creating a DSL for a database client.
+## Argument escaping
+
+Zer allows you to output Objects, not just Strings. This is especially useful when you wish to escape some arguments from your chain, such as when creating a DSL for a database client (SQL, Gremlin...).
 
 ```javascript
 const chain = g.V().has('name', 'Alice').repeat(out('knows')).until(has('name', 'Bob'));
