@@ -3,7 +3,8 @@ export { createChainCreator } from './factories';
 import { createChainCreator } from './factories';
 import { createChain } from './chain';
 
-import { toGroovy, toBoundGroovy } from './groovy';
+import { toGroovy } from './groovy';
+import { toBoundGroovy } from './gremlin-groovy';
 
 
 export const groovy = createChainCreator(createChain, toGroovy);
@@ -14,5 +15,3 @@ export default {
   groovy,
   gremlin,
 };
-
-
