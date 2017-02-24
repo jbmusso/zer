@@ -55,11 +55,15 @@ function createChain(chainName, chainFactory, render) {
 }
 
 export const inspectSymbol = Symbol('inspect');
+export const renderSymbol = Symbol('render');
 
 function createHandler(chain, methodName, render) {
   const handlers = {
     [inspectSymbol]() {
       return chain.members;
+    },
+    [renderSymbol]() {
+      return render(chain);
     },
     toString() {
       return () => render(chain)

@@ -99,6 +99,12 @@ export function toBoundGroovy(chain, nameIdentifier = (offset) => `p${offset}`, 
   }, boundAcc);
 }
 
-const gremlin = createChainCreator(createChain, toBoundGroovy);
+export function toBoundGroovy(chain) {
+  const { query, params } = render(chain)
+
+  return { query, params };
+}
+
+const gremlin = createChainCreator(createChain, render);
 
 export default gremlin;
