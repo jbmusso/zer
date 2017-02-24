@@ -13,13 +13,13 @@ function serializeArgument(paramValue, nameIdentifier, boundAcc) {
   // If Argument is a Chain, that chain needs to be escaped recursively
   // then merged back into the parent chain.
   if (paramValue instanceof Chain) {
-    return toBoundGroovy(paramValue, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
+    return render(paramValue, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
   }
 
   if (typeof paramValue === 'function') {
     // TODO: cleanup dirty hack and make sure paramValue is an instance of
     // Chain rather than a function
-    return toBoundGroovy({ members: paramValue.__repr__() }, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
+    return render({ members: paramValue.__repr__() }, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
   }
 
   // Argument is a Primitive and can be safely escaped/bound.
@@ -79,7 +79,7 @@ const GREMLIN_GROOVY = {
   }
 }
 
-export function toBoundGroovy(chain, nameIdentifier = (offset) => `p${offset}`, boundAcc = { query: '', params: {}, offset: 0 }) {
+function render(chain, nameIdentifier = (offset) => `p${offset}`, boundAcc = { query: '', params: {}, offset: 0 }) {
 
   return chain.members.reduce((currentAcc, member) => {
     const {
