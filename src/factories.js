@@ -71,11 +71,11 @@ function createProxyHandlers(chain, methodName, render) {
     },
     // Called with console.log(chain) -- single arg
     [util.inspect.custom]() {
-      return () => 'Chain: ' + util.inspect(render(chain))
+      return () => util.inspect(render(chain))
     },
     // Called with console.log('arg', chain) -- multiple args
     [Symbol.toPrimitive]() {
-      return () => 'Chain: '+ util.inspect(render(chain));
+      return () => util.inspect(render(chain));
     },
     __repr__() {
       return () => chain.members;

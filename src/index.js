@@ -11,12 +11,12 @@ export const gremlin = createChainCreator(toBoundGroovy);
 
 import { inspectSymbol, renderSymbol } from './factories';
 
-export function inspect(chain) {
-  return chain[inspectSymbol];
+export function inspect(chainProxy) {
+  return chainProxy[inspectSymbol];
 }
 
-export function render(chain) {
-	return chain[renderSymbol];
+export function render(chainProxy) {
+	return chainProxy[renderSymbol];
 }
 
 export default {
