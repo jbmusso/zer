@@ -1,7 +1,10 @@
 import { assert } from 'chai';
 
-import { createChain } from '../chain';
-import { toBoundGroovy } from './';
+import { createChain } from '../../chain';
+import render from './';
+
+import groovySyntax from '../../lang/groovy';
+import gremlinEscaper from './';
 
 
 describe('Serialization', () => {
@@ -11,7 +14,7 @@ describe('Serialization', () => {
       .addStep('bar')
       .addArguments('name', 'Alice');
 
-    const repr = toBoundGroovy(chain);
+    const repr = render(chain, groovySyntax);
 
     assert.isObject(repr);
     assert.equal(repr.query, `foo.bar(p0, p1)`);
@@ -26,7 +29,7 @@ describe('Serialization', () => {
       .addStep('has')
       .addArguments('age', 30)
 
-    const repr = toBoundGroovy(chain);
+    const repr = render(chain, groovySyntax);
 
     assert.isObject(repr);
     assert.equal(repr.query, `foo.has(p0, p1).has(p2, p3)`);
@@ -49,7 +52,7 @@ describe('Serialization', () => {
           .addArguments('firstname', 'Bob')
       );
 
-    const repr = toBoundGroovy(chain);
+    const repr = render(chain, groovySyntax);
 
     assert.deepPropertyVal(repr, 'params.p0', 'name');
     assert.deepPropertyVal(repr, 'params.p1', 'Alice');

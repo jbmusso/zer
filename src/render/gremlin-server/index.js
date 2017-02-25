@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
-import { createChainCreator } from '../factories';
-import { Chain } from '../chain';
+import { createChainCreator } from '../../factories';
+import { Chain } from '../../chain';
 
 
 const GROOVY_FORMAT_NORMAL = {
@@ -9,17 +9,17 @@ const GROOVY_FORMAT_NORMAL = {
 }
 
 
-function serializeArgument(paramValue, nameIdentifier, boundAcc) {
+function renderArgument(argument, syntax, nameIdentifier, boundAcc) {
   // If Argument is a Chain, that chain needs to be escaped recursively
   // then merged back into the parent chain.
-  if (paramValue instanceof Chain) {
-    return render(paramValue, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
+  if (argument instanceof Chain) {
+    return render(argument, syntax, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
   }
 
-  if (typeof paramValue === 'function') {
-    // TODO: cleanup dirty hack and make sure paramValue is an instance of
+  if (typeof argument === 'function') {
+    // TODO: cleanup dirty hack and make sure argument is an instance of
     // Chain rather than a function
-    return render({ members: paramValue.__repr__() }, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
+    return render({ members: argument.__repr__() }, syntax, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
   }
 
   // Argument is a Primitive and can be safely escaped/bound.
@@ -31,7 +31,7 @@ function serializeArgument(paramValue, nameIdentifier, boundAcc) {
   return {
     query: paramKey,
     params: {
-      [paramKey]: paramValue
+      [paramKey]: argument
     },
     offset: boundAcc.offset
   };
@@ -39,23 +39,23 @@ function serializeArgument(paramValue, nameIdentifier, boundAcc) {
 
 
 
-const GREMLIN_GROOVY = {
-  CHAIN_START(member) {
+const GREMLIN_SERVER = {
+  CHAIN_START(member, syntax) {
     return {
-      query: member.name
+      query: syntax.CHAIN_START(member)
     };
   },
 
-  STEP(member) {
+  STEP(member, syntax) {
     return {
-      query: `.${member.name}`
+      query: syntax.STEP(member)
     }
   },
 
-  ARGUMENTS(chainMember, nameIdentifier, boundAcc) {
+  ARGUMENTS(chainMember, syntax, nameIdentifier, boundAcc) {
     const boundParams = _(chainMember.params)
-      .map((paramValue) => {
-        return serializeArgument(paramValue, nameIdentifier, boundAcc)
+      .map((argument) => {
+        return renderArgument(argument, syntax, nameIdentifier, boundAcc)
       })
       .reduce((acc, { query = '', params, offset }) => {
         acc.inline.push(query);
@@ -71,7 +71,9 @@ const GREMLIN_GROOVY = {
       }, { inline: [], params: {} });
 
     return {
-      query: `(${boundParams.inline.join(GROOVY_FORMAT_NORMAL.ARGUMENT_SEPARATOR)})`,
+      query: syntax.ARGUMENTS(
+        boundParams.inline.join(syntax.ARGUMENT_SEPARATOR)
+      ),
       params: boundParams.params,
       // todo: write tests, ensure offset gets propagated to next calls
       offset: boundParams.offset
@@ -79,14 +81,14 @@ const GREMLIN_GROOVY = {
   }
 }
 
-function render(chain, nameIdentifier = (offset) => `p${offset}`, boundAcc = { query: '', params: {}, offset: 0 }) {
+function render(chain, syntax, nameIdentifier = (offset) => `p${offset}`, boundAcc = { query: '', params: {}, offset: 0 }) {
 
   return chain.members.reduce((currentAcc, member) => {
     const {
       query = '',
       params = {},
       offset = currentAcc.offset
-    } = GREMLIN_GROOVY[member.type](member, nameIdentifier, currentAcc);
+    } = GREMLIN_SERVER[member.type](member, syntax, nameIdentifier, currentAcc);
 
     currentAcc.query += query;
     currentAcc.params = {
@@ -99,12 +101,9 @@ function render(chain, nameIdentifier = (offset) => `p${offset}`, boundAcc = { q
   }, boundAcc);
 }
 
-export function toBoundGroovy(chain) {
-  const { query, params } = render(chain)
+export default function(chain, syntax) {
+  const { query, params } = render(chain, syntax)
 
   return { query, params };
 }
 
-const gremlin = createChainCreator(render);
-
-export default gremlin;

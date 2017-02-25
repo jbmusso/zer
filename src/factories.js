@@ -2,11 +2,11 @@ import util from 'util';
 
 import { createChain } from './chain';
 
-export function createChainCreator(render) {
+export function createChainCreator(render, syntax) {
   // This Proxy initiates the chain, and must return a new Chain
   const handler = {
     get(target, name, receiver) {
-      return createChainProxy(name, render);
+      return createChainProxy(name, render, syntax);
     }
   };
 
@@ -21,7 +21,7 @@ const NO_INTERCEPT = [
   Symbol.toStringTag
 ];
 
-function createChainProxy(chainName, render) {
+function createChainProxy(chainName, render, syntax) {
   return new Proxy(() => {}, {
     get(target, name) {
       if (name === 'toString') {
@@ -35,7 +35,7 @@ function createChainProxy(chainName, render) {
       const chain = createChain()
         .startWith(chainName)
 
-      const chainBuilder = createChainBuilder(chain, render);
+      const chainBuilder = createChainBuilder(chain, render, syntax);
 
       chainBuilder[name];
 
@@ -48,7 +48,7 @@ function createChainProxy(chainName, render) {
 
       chain.addArguments(...args);
 
-      const chainBuilder = createChainBuilder(chain, render);
+      const chainBuilder = createChainBuilder(chain, render, syntax);
 
       return chainBuilder;
     },
@@ -58,24 +58,24 @@ function createChainProxy(chainName, render) {
 export const inspectSymbol = Symbol('inspect');
 export const renderSymbol = Symbol('render');
 
-function createProxyHandlers(chain, methodName, render) {
+function createProxyHandlers(chain, methodName, render, syntax) {
   const handlers = {
     [inspectSymbol]() {
       return chain.members;
     },
     [renderSymbol]() {
-      return render(chain);
+      return render(chain, syntax);
     },
     toString() {
-      return () => render(chain)
+      return () => render(chain, syntax)
     },
     // Called with console.log(chain) -- single arg
     [util.inspect.custom]() {
-      return () => util.inspect(render(chain))
+      return () => util.inspect(render(chain, syntax))
     },
     // Called with console.log('arg', chain) -- multiple args
     [Symbol.toPrimitive]() {
-      return () => util.inspect(render(chain));
+      return () => util.inspect(render(chain, syntax));
     },
     __repr__() {
       return () => chain.members;
@@ -86,10 +86,10 @@ function createProxyHandlers(chain, methodName, render) {
 }
 
 
-export function createChainBuilder(chain, render) {
+export function createChainBuilder(chain, render, syntax) {
   const chainProxy = new Proxy(() => chain, {
     get(target, name, receiver) {
-      const handler = createProxyHandlers(chain, name, render);
+      const handler = createProxyHandlers(chain, name, render, syntax);
 
       if (handler) {
         return handler();

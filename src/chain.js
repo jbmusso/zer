@@ -15,7 +15,7 @@ class Step {
   }
 }
 
-class Arguments {
+export class Arguments {
   constructor(params = []) {
     this.params = params;
     this.type = 'ARGUMENTS'

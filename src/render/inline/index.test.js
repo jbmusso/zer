@@ -1,9 +1,12 @@
 import { assert } from 'chai';
 
-import { createChain } from '../chain';
+import { createChain } from '../../chain';
 
-import { toGroovy, toBoundGroovy } from './';
-import groovy from './';
+import { createChainCreator } from '../../factories';
+import groovySyntax from '../../lang/groovy';
+import renderInline from './';
+
+const groovy = createChainCreator(renderInline, groovySyntax);
 
 
 describe('Serialization', () => {
@@ -41,7 +44,7 @@ describe('Serialization', () => {
       .addStep('bar')
       .addArguments('name', 'Alice');
 
-    const repr = toGroovy(chain);
+    const repr = renderInline(chain, groovySyntax);
 
     assert.equal(repr, `foo.bar('name', 'Alice')`);
   });
@@ -60,7 +63,7 @@ describe('Serialization', () => {
           .addArguments('name', 'Bob')
       );
 
-    const repr = toGroovy(chain);
+    const repr = renderInline(chain, groovySyntax);
 
     assert.equal(repr, `g.V().has('name', 'Alice').repeat(out('name', 'Bob'))`);
   });
