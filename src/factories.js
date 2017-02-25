@@ -1,11 +1,12 @@
 import util from 'util';
 
+import { createChain } from './chain';
 
-export function createChainCreator(chainFactory, render) {
+export function createChainCreator(render) {
   // This Proxy initiates the chain, and must return a new Chain
   const handler = {
     get(target, name, receiver) {
-      return createChain(name, chainFactory, render);
+      return createChainProxy(name, render);
     }
   };
 
@@ -20,7 +21,7 @@ const NO_INTERCEPT = [
   Symbol.toStringTag
 ];
 
-function createChain(chainName, chainFactory, render) {
+function createChainProxy(chainName, render) {
   return new Proxy(() => {}, {
     get(target, name) {
       if (name === 'toString') {
@@ -31,7 +32,7 @@ function createChain(chainName, chainFactory, render) {
         return target[name];
       }
       
-      const chain = chainFactory()
+      const chain = createChain()
         .startWith(chainName)
 
       const chainer = createMemberChainer(chain, render);
@@ -42,7 +43,7 @@ function createChain(chainName, chainFactory, render) {
     },
 
     apply(target, thisArg, args) {
-      const chain = chainFactory()
+      const chain = createChain()
         .startWith(chainName);
 
       chain.addArguments(...args);

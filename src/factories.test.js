@@ -6,8 +6,8 @@ import { toGroovy } from './groovy';
 import { createChain } from './chain';
 
 
-const Objects = createChainCreator(createChain, toGroovy);
-const Steps = createChainCreator(createChain, toGroovy);
+const Objects = createChainCreator(toGroovy);
+const Steps = createChainCreator(toGroovy);
 
 
 describe('Steps', () => {

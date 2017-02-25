@@ -1,14 +1,14 @@
 export { createChainCreator } from './factories';
 
 import { createChainCreator } from './factories';
-import { createChain } from './chain';
+// import { createChain } from './chain';
 
 import { toGroovy } from './groovy';
 import { toBoundGroovy } from './gremlin-groovy';
 
 
-export const groovy = createChainCreator(createChain, toGroovy);
-export const gremlin = createChainCreator(createChain, toBoundGroovy);
+export const groovy = createChainCreator(toGroovy);
+export const gremlin = createChainCreator(toBoundGroovy);
 
 import { inspectSymbol, renderSymbol } from './factories';
 
