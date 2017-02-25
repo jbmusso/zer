@@ -3,8 +3,6 @@ import { assert } from 'chai';
 import { createChainCreator } from './';
 
 import { toGroovy } from './groovy';
-import { createChain } from './chain';
-
 
 const Objects = createChainCreator(toGroovy);
 const Steps = createChainCreator(toGroovy);

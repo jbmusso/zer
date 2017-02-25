@@ -1,7 +1,6 @@
 export { createChainCreator } from './factories';
 
 import { createChainCreator } from './factories';
-// import { createChain } from './chain';
 
 import { toGroovy } from './groovy';
 import { toBoundGroovy } from './gremlin-groovy';
