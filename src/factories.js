@@ -35,11 +35,11 @@ function createChainProxy(chainName, render) {
       const chain = createChain()
         .startWith(chainName)
 
-      const chainer = createMemberChainer(chain, render);
+      const chainBuilder = createChainBuilder(chain, render);
 
-      chainer[name];
+      chainBuilder[name];
 
-      return chainer;
+      return chainBuilder;
     },
 
     apply(target, thisArg, args) {
@@ -48,9 +48,9 @@ function createChainProxy(chainName, render) {
 
       chain.addArguments(...args);
 
-      const chainer = createMemberChainer(chain, render);
+      const chainBuilder = createChainBuilder(chain, render);
 
-      return chainer;
+      return chainBuilder;
     },
   });
 }
@@ -58,7 +58,7 @@ function createChainProxy(chainName, render) {
 export const inspectSymbol = Symbol('inspect');
 export const renderSymbol = Symbol('render');
 
-function createHandler(chain, methodName, render) {
+function createProxyHandlers(chain, methodName, render) {
   const handlers = {
     [inspectSymbol]() {
       return chain.members;
@@ -86,10 +86,10 @@ function createHandler(chain, methodName, render) {
 }
 
 
-export function createMemberChainer(chain, render) {
+export function createChainBuilder(chain, render) {
   const chainProxy = new Proxy(() => chain, {
     get(target, name, receiver) {
-      const handler = createHandler(chain, name, render);
+      const handler = createProxyHandlers(chain, name, render);
 
       if (handler) {
         return handler();
