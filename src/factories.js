@@ -1,48 +1,42 @@
+/* @flow */
 import util from 'util';
 
-import { createChain } from './chain';
+import { createChain, Chain, ChainMember } from './chain';
+import type { Syntax, Renderer, Render } from './types';
 
-export function createChainCreator(render, syntax) {
+
+export type ChainCreatorProxy = Proxy<createProxiedChain>;
+
+export function createChainCreator(render: Renderer<Render<*>>, syntax: Syntax): ChainCreatorProxy {
   // This Proxy initiates the chain, and must return a new Chain
   const handler = {
-    get(target, name, receiver) {
-      return createChainProxy(name, render, syntax);
+    get(targetCreateChainProxy: Function, name: string): ChainProxy {
+      return targetCreateChainProxy(name, render, syntax);
     }
   };
 
-  return new Proxy({}, handler);
+  return new Proxy(createProxiedChain, handler);
 };
 
-const NO_INTERCEPT = [
-  'constructor',
-  'toString',
-  'inspect',
-  'nodeType',
-  Symbol.toStringTag
-];
+type GenericMap = { [key: any]: any };
+type ProxiedFunction = (...args: Array<any>) => any;
+type ChainProxy = Proxy<GenericMap>;
 
-function createChainProxy(chainName, render, syntax) {
-  return new Proxy(() => {}, {
-    get(target, name) {
-      if (name === 'toString') {
-        return () => chainName
-      }
 
-      if (NO_INTERCEPT.includes(name)) {
-        return target[name];
-      }
-      
-      const chain = createChain()
-        .startWith(chainName)
+function createProxiedChain(chainName: string, render: Renderer<Render<*>>, syntax: Syntax): ChainProxy {
+  const proxiedChain = new Proxy(() => {}, {
+    get(target: Function, name: string): ChainBuilder {
+      const chain: Chain = createChain()
+        .startWith(chainName);
 
-      const chainBuilder = createChainBuilder(chain, render, syntax);
+      const chainBuilder: ChainBuilder = createChainBuilder(chain, render, syntax);
 
       chainBuilder[name];
 
       return chainBuilder;
     },
 
-    apply(target, thisArg, args) {
+    apply(target: Function, thisArg: *, args: Array<*>): ChainBuilder {
       const chain = createChain()
         .startWith(chainName);
 
@@ -53,42 +47,46 @@ function createChainProxy(chainName, render, syntax) {
       return chainBuilder;
     },
   });
+
+  return proxiedChain;
 }
 
-export const inspectSymbol = Symbol('inspect');
-export const renderSymbol = Symbol('render');
+export const inspectSymbol: Symbol = Symbol('inspect');
+export const renderSymbol: Symbol = Symbol('render');
 
-function createProxyHandlers(chain, methodName, render, syntax) {
+function createProxyHandlers(chain: Chain, methodName: string, render: Renderer<Render<*>>, syntax: Syntax): any {
   const handlers = {
-    [inspectSymbol]() {
+    [inspectSymbol](): Array<ChainMember> {
       return chain.members;
     },
-    [renderSymbol]() {
+    [renderSymbol](): Renderer<Render<*>> {
       return render(chain, syntax);
     },
-    toString() {
-      return () => render(chain, syntax)
+    toString(): Renderer<Render<string>> {
+      return (): Render<string> => render(chain, syntax);
     },
     // Called with console.log(chain) -- single arg
-    [util.inspect.custom]() {
-      return () => util.inspect(render(chain, syntax))
+    [util.inspect.custom](): Renderer<Render<string>> {
+      return (): Render<string> => util.inspect(render(chain, syntax));
     },
     // Called with console.log('arg', chain) -- multiple args
-    [Symbol.toPrimitive]() {
-      return () => util.inspect(render(chain, syntax));
+    [Symbol.toPrimitive](): Renderer<Render<string>> {
+      return (): Render<string> => util.inspect(render(chain, syntax));
     },
-    __repr__() {
-      return () => chain.members;
+    __repr__(): Function {
+      return (): Array<ChainMember> => chain.members;
     }
-  }
+  };
 
   return handlers[methodName];
 }
 
 
-export function createChainBuilder(chain, render, syntax) {
-  const chainProxy = new Proxy(() => chain, {
-    get(target, name, receiver) {
+export type ChainBuilder = Proxy<ProxiedFunction>;
+
+export function createChainBuilder(chain: Chain, render: Renderer<Render<*>>, syntax: Syntax): ChainBuilder {
+  const chainProxy = new Proxy(() => {}, {
+    get(target: Function, name: string, receiver: ChainBuilder): ChainBuilder {
       const handler = createProxyHandlers(chain, name, render, syntax);
 
       if (handler) {
@@ -100,7 +98,7 @@ export function createChainBuilder(chain, render, syntax) {
       return receiver;
     },
 
-    apply(target, thisArg, args) {
+    apply(target: Function, thisArg: any, args: Array<any>): ChainBuilder {
       chain.addArguments(...args);
 
       return chainProxy;

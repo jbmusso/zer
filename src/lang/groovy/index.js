@@ -1,30 +1,31 @@
+/* @flow */
 import _ from 'lodash';
 import { Chain } from '../../chain';
 
+import type { Syntax, ChainMember } from '../../types';
 
-const language = {
+const groovySyntax: Syntax = {
   ARGUMENT_SEPARATOR: ', ',
 
-  STRING(param) {
+  STRING(param: string): string {
     return `'${param}'`;
   },
 
-  DEFAULT(param) {
+  DEFAULT(param: any): string {
     return param.toString();
   },
 
-  CHAIN_START(member) {
+  CHAIN_START(member: ChainMember): string {
     return member.name;
   },
 
-  STEP(member) {
-    return `.${member.name}`
+  STEP(member: ChainMember): string {
+    return `.${member.name}`;
   },
 
-  ARGUMENTS(serializedArguments) {
+  ARGUMENTS(serializedArguments: string): string {
     return `(${serializedArguments})`;
   },
-}
+};
 
-
-export default language;
+export default groovySyntax;

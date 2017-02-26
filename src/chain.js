@@ -1,53 +1,66 @@
+/* @flow */
 import _ from 'lodash';
 
+export class ChainMember {
+  name: string;
+  type: string;
+}
 
-class ChainStart {
-  constructor(name) {
+class ChainStart extends ChainMember {
+  constructor(name: string) {
+    super();
     this.name = name;
     this.type = 'CHAIN_START';
   }
 }
 
-class Step {
-  constructor(name) {
+class Step extends ChainMember {
+  constructor(name: string) {
+    super();
     this.name = name;
     this.type = 'STEP';
   }
 }
 
-export class Arguments {
-  constructor(params = []) {
+
+export class Arguments extends ChainMember {
+  params: Array<any>;
+
+  constructor(params: Array<any> = []) {
+    super();
     this.params = params;
-    this.type = 'ARGUMENTS'
+    this.type = 'ARGUMENTS';
   }
 }
 
 export class Chain {
+  members: Array<ChainMember>
+
   constructor() {
     this.members = [];
   }
 
-  startWith(identifierName) {
+  startWith(identifierName: string): Chain {
     this.members.push(new ChainStart(identifierName));
     return this;
   }
 
-  addStep(name) {
+  addStep(name: string): Chain {
     this.members.push(new Step(name));
     return this;
   }
 
-  addArguments(...args) {
+  addArguments(...args: Array<any>): Chain {
     this.members.push(new Arguments(args));
     return this;
   }
 
-  __repr__(...args) {
+  __repr__(): Array<ChainMember> {
     return this.members;
   }
 }
 
 // TODO: missing name argument here?
-export function createChain() {
+export function createChain(): Chain {
   return new Chain();
 }

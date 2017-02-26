@@ -1,13 +1,16 @@
+/* @flow */
 import _ from 'lodash';
-import { Chain, Arguments } from '../../chain';
+import { Chain, ChainMember, Arguments } from '../../chain';
+
+import type { Syntax, Render } from '../../types';
 
 
-function renderArgument(argument, syntax) {
+function renderArgument(argument, syntax: Syntax): string {
   if (argument instanceof Chain) {
-    return render(argument, syntax);
+    return renderInline(argument, syntax);
   }
 
-  if (_.isString(argument)) {
+  if (_.isString(argument)) {
     return syntax.STRING(argument);
   }
 
@@ -16,7 +19,7 @@ function renderArgument(argument, syntax) {
   }
 }
 
-function renderMember(member, syntax) {
+function renderMember(member: ChainMember, syntax: Syntax): string {
   if (member instanceof Arguments) {
     return syntax.ARGUMENTS(
       member.params
@@ -28,8 +31,8 @@ function renderMember(member, syntax) {
   return syntax[member.type](member);
 }
 
-export default function render({ members }, syntax) {
+export default function renderInline({ members }: Chain, syntax: Syntax): Render<string> {
   return members
-    .map((member) => renderMember(member, syntax))
+    .map((member: ChainMember): string => renderMember(member, syntax))
     .join('');
 }

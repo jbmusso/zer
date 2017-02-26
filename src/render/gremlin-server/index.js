@@ -1,3 +1,4 @@
+/* @flow */
 import _ from 'lodash';
 
 import { createChainCreator } from '../../factories';
@@ -30,7 +31,7 @@ function renderArgument(argument, syntax, nameIdentifier, boundAcc) {
   // Return the intermediate query
   return {
     query: paramKey,
-    params: {
+    params: {
       [paramKey]: argument
     },
     offset: boundAcc.offset
