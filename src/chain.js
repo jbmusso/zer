@@ -55,6 +55,11 @@ export class Chain {
     return this;
   }
 
+  append(chain: Chain): Chain {
+    this.members = [...this.members, ...chain.members];
+    return this;
+  }
+
   __repr__(): Array<ChainMember> {
     return this.members;
   }
