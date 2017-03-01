@@ -32,12 +32,12 @@ export function inspectSyntax(chain) {
 /**
  * A ProxiedChain is a Proxy<Function>
  */
-function createProxiedChain(chainName: string, render: Renderer<Render<*>>, syntax: Syntax): Proxy<Function> {
+function createProxiedChain(chainName: string, render: Renderer<Render<*>>, syntax: Syntax, custom = {}): Proxy<Function> {
   const proxiedChain = new Proxy(createChainBuilder, {
     get(target: Function, name: string): ChainBuilder {
       const chain: Chain = createChain()
         .startWith(chainName);
-      const builder = target(chain, render, syntax)[name];
+      const builder = target(chain, render, syntax, custom)[name];
 
       return builder;
     },
@@ -45,7 +45,7 @@ function createProxiedChain(chainName: string, render: Renderer<Render<*>>, synt
     apply(target: Function, thisArg: *, args: Array<*>): ChainBuilder {
       const chain = createChain()
         .startWith(chainName);
-      const builder = target(chain, render, syntax)(...args);
+      const builder = target(chain, render, syntax, custom)(...args);
 
       return builder;
     },
@@ -56,6 +56,7 @@ function createProxiedChain(chainName: string, render: Renderer<Render<*>>, synt
 
 export const inspectSymbol: Symbol = Symbol('inspect');
 export const renderSymbol: Symbol = Symbol('render');
+export const chainSymbol: Symbol = Symbol('chain');
 
 function createProxyHandlers(chain: Chain, methodName: string, render: Renderer<Render<*>>, syntax: Syntax): any {
   const handlers = {
@@ -71,6 +72,9 @@ function createProxyHandlers(chain: Chain, methodName: string, render: Renderer<
     [syntaxSymbol]() {
       return syntax;
     },
+    [chainSymbol]() {
+      return chain;
+    },    
     toString(): Renderer<Render<string>> {
       return (): Render<string> => render(chain, syntax);
     },
