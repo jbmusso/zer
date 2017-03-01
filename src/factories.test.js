@@ -1,37 +1,40 @@
+/* @flow */
 import { assert } from 'chai';
 
 import { createChainCreator } from './';
 
-import { toGroovy } from './lang/groovy';
+// import { toGroovy } from './lang/groovy';
 
-const Objects = createChainCreator(toGroovy);
-const Steps = createChainCreator(toGroovy);
+import groovySyntax from './lang/groovy';
+import renderInline from './render/inline';
+
+const Objects = createChainCreator(renderInline, groovySyntax);
 
 
 describe('Steps', () => {
   it('should expose any step', () => {
-    const { out } = Steps;
+    const { out } = Objects;
     const chain = out;
 
     assert.isFunction(chain);
   });
 
   it('should expose callable steps', () => {
-    const { out } = Steps;
+    const { out } = Objects;
     const chain = out();
 
     assert.isFunction(chain);
   });
 
   it('should expose steps callable with arguments', () => {
-    const { out } = Steps;
+    const { out } = Objects;
     const chain = out('firstname', 'Alice');
 
     assert.isFunction(chain);
   });
 
-  it('should expose steps callable with arguments and the proper __repr__()', () => {
-    const { out } = Steps;
+  it.skip('should expose steps callable with arguments and the proper __repr__()', () => {
+    const { out } = Objects;
     const repr = out('firstname', 'Alice').__repr__();
 
     assert.deepPropertyVal(repr, '0.name', 'out');
