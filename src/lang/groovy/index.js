@@ -19,6 +19,10 @@ const groovySyntax: Syntax = {
     return member.name;
   },
 
+  PROPERTY_ACCESSOR(): string {
+    return '.';
+  },
+
   STEP(member: ChainMember): string {
     return `.${member.name}`;
   },

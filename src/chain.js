@@ -14,6 +14,13 @@ class ChainStart extends ChainMember {
   }
 }
 
+class PropertyAccessor extends ChainMember {
+  constructor() {
+    super();
+    this.type = 'PROPERTY_ACCESSOR';
+  }
+}
+
 class Step extends ChainMember {
   constructor(name: string) {
     super();
@@ -57,6 +64,11 @@ export class Chain {
 
   append(chain: Chain): Chain {
     this.members = [...this.members, ...chain.members];
+    return this;
+  }
+
+  composeWith(chain: Chain): Chain {
+    this.members = [...this.members, new PropertyAccessor(), ...chain.members];
     return this;
   }
 
