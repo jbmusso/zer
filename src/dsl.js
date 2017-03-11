@@ -14,13 +14,11 @@ function wrapBuilder(builder, dsl: DSL) {
     get(target, name, receiver) {
       if (_.has(dsl, name)) {
         return (...args) => {
-          // Generate next chain to toAppend to the previous
-          const dslChain = dsl[name](...args); 
+          const dslChainProxy = dsl[name](...args); 
+          const dslChain = dslChainProxy[chainSymbol];
 
-          const targetedChain = innerChain(target);
-          const targetedDslChain = innerChain(dslChain);
+          target[chainSymbol].composeWith(dslChain);
 
-          targetedChain.composeWith(targetedDslChain);
           return wrapBuilder(target, dsl);
         };
       }
@@ -37,8 +35,9 @@ function wrapBuilder(builder, dsl: DSL) {
     },
 
     apply(target, thisArg, args) {
-      // Intercept the call, and ensure we still return a wrappedBuilder
-      // so next steps can chain custom steps as well as generics.
+      // Intercept function call, and ensure we still return a wrappedBuilder
+      // so next steps can continue chaining custom steps as well as generic
+      // steps.
       const toWrap = target(...args);
 
       return wrapBuilder(toWrap, dsl);
@@ -50,7 +49,9 @@ function wrapBuilder(builder, dsl: DSL) {
 export function createDsl(chainCreator: ChainCreatorProxy, dsl: DSL) {
   return new Proxy(chainCreator, {
     get(target, name, receiver) {
-      return wrapBuilder(target[name], dsl);
+      const builder = target[name];
+
+      return wrapBuilder(builder, dsl);
     }
   });
 }

@@ -25,7 +25,8 @@ export function renderChain(chainProxy: ChainBuilder): Render<*> {
 }
 
 export function innerChain(chainProxy: ChainBuilder): Chain {
-return chainProxy[chainSymbol]}
+  return chainProxy[chainSymbol];
+}
 
 export default {
   groovy,

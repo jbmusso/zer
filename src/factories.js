@@ -1,13 +1,18 @@
 /* @flow */
 import util from 'util';
+import _ from 'lodash';
 
 import { createChain, Chain, ChainMember } from './chain';
 import type { Syntax, Renderer, Render } from './types';
 
 
-export type ChainCreatorProxy = Proxy<createProxiedChain>;
+export type ChainCreator = Proxy<createProxiedChain>;
 
-export function createChainCreator(render: Renderer<Render<*>>, syntax: Syntax): ChainCreatorProxy {
+/**
+ * Given a rendering function and a syntax, returns a Proxy which can intercept
+ * any property and creates a Chain that starts with that property 'name'.
+ */
+export function createChainCreator(render: Renderer<Render<*>>, syntax: Syntax): ChainCreator {
   // This Proxy initiates the chain, and must return a new Chain
   const handler = {
     get(createProxiedChainTarget: Function, name: string): ChainProxy {
@@ -30,14 +35,17 @@ export function inspectSyntax(chain) {
   return chain[syntaxSymbol];
 }
 /**
- * A ProxiedChain is a Proxy<Function>
+ * Given a 'name', the Proxy intercepts and return a new ChainBuilder.
+ * 'createChainBuilder' is a function that returns a Proxy<Function>.
  */
-function createProxiedChain(chainName: string, render: Renderer<Render<*>>, syntax: Syntax, custom = {}): Proxy<Function> {
-  const proxiedChain = new Proxy(createChainBuilder, {
+function createProxiedChain(chainName: string, render: Renderer<Render<*>>, syntax: Syntax): Proxy<Function> {
+
+  return new Proxy(createChainBuilder, {
     get(target: Function, name: string): ChainBuilder {
       const chain: Chain = createChain()
         .startWith(chainName);
-      const builder = target(chain, render, syntax, custom)[name];
+
+      const builder = target(chain, render, syntax)[name];
 
       return builder;
     },
@@ -45,20 +53,18 @@ function createProxiedChain(chainName: string, render: Renderer<Render<*>>, synt
     apply(target: Function, thisArg: *, args: Array<*>): ChainBuilder {
       const chain = createChain()
         .startWith(chainName);
-      const builder = target(chain, render, syntax, custom)(...args);
+      const builder = target(chain, render, syntax)(...args);
 
       return builder;
     },
   });
-
-  return proxiedChain;
 }
 
 export const inspectSymbol: Symbol = Symbol('inspect');
 export const renderSymbol: Symbol = Symbol('render');
 export const chainSymbol: Symbol = Symbol('chain');
 
-function createProxyHandlers(chain: Chain, methodName: string, render: Renderer<Render<*>>, syntax: Syntax): any {
+function createProxyHandlers(chain: Chain, render: Renderer<Render<*>>, syntax: Syntax): any {
   const handlers = {
     [inspectSymbol](): Array<ChainMember> {
       return chain.members;
@@ -72,7 +78,7 @@ function createProxyHandlers(chain: Chain, methodName: string, render: Renderer<
     [syntaxSymbol]() {
       return syntax;
     },
-    [chainSymbol]() {
+    [chainSymbol](): Chain {
       return chain;
     },    
     toString(): Renderer<Render<string>> {
@@ -94,26 +100,46 @@ function createProxyHandlers(chain: Chain, methodName: string, render: Renderer<
     }
   };
 
-  return handlers[methodName];
+  return handlers;
 }
+
 
 
 export type ChainBuilder = Proxy<ProxiedFunction>;
 
-export function createChainBuilder(chain: Chain, render: Renderer<Render<*>>, syntax: Syntax, custom = {}): ChainBuilder {
-  const builder = new Proxy(() => {}, {
-    get(target: Function, name: string, receiver: ChainBuilder): ChainBuilder {
-      const handler = createProxyHandlers(chain, name, render, syntax);
+/**
+ * Given a Chain, returns a Proxy which intercepts all property lookups
+ * and function calls and helps adding generic members to that chain.
+ *
+ * The Proxy target is a no-op function. This allows us to intercept any
+ * property lookup (since functions are objects in JavaScript) as well
+ * as function calls. The following will be intercepted by the Proxy:
+ *    foo.bar
+ *    foo.bar()
+ *    foo.bar(...args);
+ */
+export function createChainBuilder(chain: Chain, render: Renderer<Render<*>>, syntax: Syntax): ChainBuilder {
 
-      if (handler) {
+  const handlers = createProxyHandlers(chain, render, syntax);
+
+  const builder = new Proxy(() => {}, {
+    // Intercepts any property lookup, such as foo.bar
+    get(target: Function, name: string, receiver: ChainBuilder): ChainBuilder {
+      const handler = handlers[name];
+
+      // Allow intercepting special names, typically Symbol (either Standard/
+      // non-Standard).
+      if (_.isFunction(handler)) {
         return handler();
       }
 
+      // Add a generic step to the Chain
       chain.addStep(name);
 
       return receiver;
     },
 
+    // Intercepts any function call, such as foo.bar(...args)
     apply(target: Function, thisArg: any, args: Array<any>): ChainBuilder {
       chain.addArguments(...args);
 
