@@ -1,8 +1,9 @@
+/* @flow */
 import _ from 'lodash';
 
 import { inspectChain, innerChain } from './';
-import { createChainBuilder, inspectRenderer, inspectSyntax, chainSymbol } from './factories';
-import type { ChainCreatorProxy } from './factories';
+import { createChainBuilder, chainSymbol } from './chain-builder';
+import type { ChainCreator } from './factories';
 
 type DSL = {
   [key: string]: (...args: Array<*>) => string
@@ -14,7 +15,7 @@ function wrapBuilder(builder, dsl: DSL) {
     get(target, name, receiver) {
       if (_.has(dsl, name)) {
         return (...args) => {
-          const dslChainProxy = dsl[name](...args); 
+          const dslChainProxy = dsl[name](...args);
           const dslChain = dslChainProxy[chainSymbol];
 
           target[chainSymbol].composeWith(dslChain);
@@ -46,7 +47,7 @@ function wrapBuilder(builder, dsl: DSL) {
 }
 
 
-export function createDsl(chainCreator: ChainCreatorProxy, dsl: DSL) {
+export function createDsl(chainCreator: ChainCreator, dsl: DSL) {
   return new Proxy(chainCreator, {
     get(target, name, receiver) {
       const builder = target[name];
