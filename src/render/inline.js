@@ -1,8 +1,8 @@
 /* @flow */
 import _ from 'lodash';
-import { Chain, ChainMember, Arguments } from '../../chain';
+import { Chain, ChainMember, Arguments } from '../chain';
 
-import type { Syntax, Render } from '../../types';
+import type { Syntax, Render } from '../types';
 
 
 function renderArgument(argument, syntax: Syntax): string {

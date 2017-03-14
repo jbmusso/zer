@@ -1,10 +1,11 @@
+/* @flow */
 import { assert } from 'chai';
 
-import { createChain } from '../../chain';
+import { createChain } from '../chain';
 
-import { createChainCreator } from '../../factories';
-import groovySyntax from '../../lang/groovy';
-import renderInline from './';
+import { createChainCreator } from '../factories';
+import groovySyntax from '../lang/groovy';
+import renderInline from './inline';
 
 const groovy = createChainCreator(renderInline, groovySyntax);
 

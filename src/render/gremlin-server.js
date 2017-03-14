@@ -1,9 +1,9 @@
 /* @flow */
 import _ from 'lodash';
 
-import { createChainCreator } from '../../factories';
-import { Chain } from '../../chain';
-import type { Syntax } from '../../types';
+import { createChainCreator } from '../factories';
+import { Chain } from '../chain';
+import type { Syntax } from '../types';
 
 
 const GROOVY_FORMAT_NORMAL = {

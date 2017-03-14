@@ -1,8 +1,8 @@
 /* @flow */
 import _ from 'lodash';
-import { Chain } from '../../chain';
+import { Chain } from '../chain';
 
-import type { Syntax, ChainMember } from '../../types';
+import type { Syntax, ChainMember } from '../types';
 
 const groovySyntax: Syntax = {
   ARGUMENT_SEPARATOR: ', ',

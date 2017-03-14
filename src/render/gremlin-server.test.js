@@ -1,10 +1,10 @@
+/* @flow */
 import { assert } from 'chai';
 
-import { createChain } from '../../chain';
-import render from './';
+import { createChain } from '../chain';
+import render from './gremlin-server';
 
-import groovySyntax from '../../lang/groovy';
-import gremlinEscaper from './';
+import groovySyntax from '../lang/groovy';
 
 
 describe('Serialization', () => {
