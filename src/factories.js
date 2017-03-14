@@ -6,7 +6,8 @@ import { createChain, Chain, ChainMember } from './chain';
 import type { Syntax, Renderer, Render } from './types';
 
 
-export type ChainCreator = Proxy<createProxiedChain>;
+export type ChainCreator = Proxy<Function>;
+type ChainProxy = Proxy<Function>;
 
 /**
  * Given a rendering function and a syntax, returns a Proxy which can intercept
@@ -25,20 +26,20 @@ export function createChainCreator(render: Renderer<Render<*>>, syntax: Syntax):
 
 export const rendererSymbol: Symbol = Symbol('renderFunction');
 
-export function inspectRenderer(chain) {
-  return chain[rendererSymbol]
+export function inspectRenderer(chain: ChainBuilder) {
+  return chain[rendererSymbol];
 }
 
 export const syntaxSymbol: Symbol = Symbol('syntax');
 
-export function inspectSyntax(chain) {
+export function inspectSyntax(chain: ChainBuilder) {
   return chain[syntaxSymbol];
 }
 /**
  * Given a 'name', the Proxy intercepts and return a new ChainBuilder.
  * 'createChainBuilder' is a function that returns a Proxy<Function>.
  */
-function createProxiedChain(chainName: string, render: Renderer<Render<*>>, syntax: Syntax): Proxy<Function> {
+function createProxiedChain(chainName: string, render: Renderer<Render<*>>, syntax: Syntax): Proxy<ChainBuilder> {
 
   return new Proxy(createChainBuilder, {
     get(target: Function, name: string): ChainBuilder {
@@ -80,7 +81,7 @@ function createProxyHandlers(chain: Chain, render: Renderer<Render<*>>, syntax: 
     },
     [chainSymbol](): Chain {
       return chain;
-    },    
+    },
     toString(): Renderer<Render<string>> {
       return (): Render<string> => render(chain, syntax);
     },
@@ -94,7 +95,7 @@ function createProxyHandlers(chain: Chain, render: Renderer<Render<*>>, syntax: 
     },
     [Symbol.toStringTag](): Renderer<Render<string>> {
       return (): Render<string> => render(chain, syntax);
-    },    
+    },
     __repr__(): Function {
       return (): Array<ChainMember> => chain.members;
     }
@@ -104,8 +105,7 @@ function createProxyHandlers(chain: Chain, render: Renderer<Render<*>>, syntax: 
 }
 
 
-
-export type ChainBuilder = Proxy<ProxiedFunction>;
+export type ChainBuilder = Proxy<Function>;
 
 /**
  * Given a Chain, returns a Proxy which intercepts all property lookups

@@ -10,10 +10,11 @@ import gremlinEscaper from './render/gremlin-server';
 import { inspectSymbol, renderSymbol, chainSymbol } from './factories';
 
 import type { Render, ChainMember } from './types';
-import type { ChainBuilder, ChainCreatorProxy } from './factories';
+import type { ChainBuilder, ChainCreator } from './factories';
+import type { Chain } from './chain';
 
-export const groovy: ChainCreatorProxy = createChainCreator(renderInline, groovySyntax);
-export const gremlin: ChainCreatorProxy = createChainCreator(gremlinEscaper, groovySyntax);
+export const groovy: ChainCreator = createChainCreator(renderInline, groovySyntax);
+export const gremlin: ChainCreator = createChainCreator(gremlinEscaper, groovySyntax);
 
 
 export function inspectChain(chainProxy: ChainBuilder): Array<ChainMember> {

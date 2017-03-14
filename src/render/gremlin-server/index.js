@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import { createChainCreator } from '../../factories';
 import { Chain } from '../../chain';
+import type { Syntax } from '../../types';
 
 
 const GROOVY_FORMAT_NORMAL = {
@@ -102,9 +103,8 @@ function render(chain, syntax, nameIdentifier = (offset) => `p${offset}`, boundA
   }, boundAcc);
 }
 
-export default function(chain, syntax) {
+export default function(chain: Chain, syntax: Syntax) {
   const { query, params } = render(chain, syntax)
 
   return { query, params };
 }
-

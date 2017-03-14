@@ -2,13 +2,11 @@
 import { assert } from 'chai';
 
 import { createChainCreator } from './';
-
-// import { toGroovy } from './lang/groovy';
-
+import type { ChainCreator } from './factories';
 import groovySyntax from './lang/groovy';
 import renderInline from './render/inline';
 
-const Objects = createChainCreator(renderInline, groovySyntax);
+const Objects: ChainCreator = createChainCreator(renderInline, groovySyntax);
 
 
 describe('Steps', () => {
@@ -27,14 +25,14 @@ describe('Steps', () => {
   });
 
   it('should expose steps callable with arguments', () => {
-    const { out } = Objects;
+    const { out } = Objects;
     const chain = out('firstname', 'Alice');
 
     assert.isFunction(chain);
   });
 
   it.skip('should expose steps callable with arguments and the proper __repr__()', () => {
-    const { out } = Objects;
+    const { out } = Objects;
     const repr = out('firstname', 'Alice').__repr__();
 
     assert.deepPropertyVal(repr, '0.name', 'out');

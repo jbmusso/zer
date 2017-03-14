@@ -14,9 +14,8 @@ function renderArgument(argument, syntax: Syntax): string {
     return syntax.STRING(argument);
   }
 
-  if (_.isNumber(argument) || _.isObject(argument)) {
-    return syntax.DEFAULT(argument);
-  }
+  // Either Number or Object
+  return syntax.DEFAULT(argument);
 }
 
 function renderMember(member: ChainMember, syntax: Syntax): string {
