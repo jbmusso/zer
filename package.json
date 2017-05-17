@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "description": "Generate Gremlin queries by chaining JavaScript function calls",
   "main": "lib/index.js",
+  "scripts": {
+    "prebuild": "rimraf lib",
+    "build": "babel -d lib --ignore *.test.js src",
+    "build:watch": "npm run build -- --watch",
+    "test": "mocha $(find src -path '*test.js') --compilers js:babel-register --recursive --reporter spec",
+    "test:watch": "npm run test -- --watch"
+  },  
   "dependencies": {
     "postinstall-build": "^2.1.3"
   },
@@ -21,13 +28,6 @@
     "mocha": "^2.4.5",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.1"
-  },
-  "scripts": {
-    "prebuild": "rimraf lib",
-    "build": "babel -d lib --ignore *.test.js src",
-    "build:watch": "npm run build -- --watch",
-    "test": "mocha $(find src -path '*test.js') --compilers js:babel-register --recursive --reporter spec",
-    "test:watch": "npm run test -- --watch"
   },
   "files": [
     "README.md",
