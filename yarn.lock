@@ -2117,9 +2117,9 @@ pluralize@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-1.2.1.tgz#d1a21483fd22bb41e58a12fa3421823140897c45"
 
-postinstall-build@^2.1.3:
-  version "2.1.3"
-  resolved "https://registry.yarnpkg.com/postinstall-build/-/postinstall-build-2.1.3.tgz#9d1886ab2949619f4c206afbe1aea95debe45c94"
+postinstall-build@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/postinstall-build/-/postinstall-build-5.0.0.tgz#75a18dcd09f75245dd69ea209748d7e0b97793eb"
 
 prelude-ls@~1.1.2:
   version "1.1.2"
