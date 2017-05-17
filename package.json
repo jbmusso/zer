@@ -10,7 +10,7 @@
     "postinstall": "postinstall-build lib",
     "test": "mocha $(find src -path '*test.js') --compilers js:babel-register --recursive --reporter spec",
     "test:watch": "npm run test -- --watch"
-  },  
+  },
   "dependencies": {
     "postinstall-build": "^5.0.0"
   },
@@ -25,7 +25,7 @@
     "eslint": "^3.16.1",
     "eslint-plugin-flowtype": "^2.30.0",
     "eslint-plugin-flowtype-errors": "^3.0.0",
-    "flow-bin": "^0.40.0",
+    "flow-bin": "^0.46.0",
     "mocha": "^2.4.5",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.1"
