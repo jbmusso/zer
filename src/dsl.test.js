@@ -1,8 +1,7 @@
 import { assert } from 'chai';
 
-import { createDsl } from './dsl';
+import { createDsl } from './dsl';
 import { groovy, renderChain } from './';
-
 
 const { g, hasLabel, has, out, users, named, V } = createDsl(groovy, {
   humans() {
@@ -16,7 +15,7 @@ const { g, hasLabel, has, out, users, named, V } = createDsl(groovy, {
   },
   named(name) {
     return has('name', name);
-  }
+  },
 });
 
 describe('Custom DSL', () => {
@@ -27,7 +26,7 @@ describe('Custom DSL', () => {
   });
 
   it('should chain generic step', () => {
-    const chain = g.V(1);    
+    const chain = g.V(1);
 
     assert.equal(renderChain(chain), 'g.V(1)');
   });
@@ -52,7 +51,7 @@ describe('Custom DSL', () => {
 
   it.skip('should chain a generic step after a custom step', () => {
     const chain = g.humans().in();
-    
+
     assert.equal(renderChain(chain), `g.V().hasLabel('human').in()`);
   });
 
@@ -64,17 +63,21 @@ describe('Custom DSL', () => {
 
   it('should chain generic and custom steps', () => {
     const chain = g.V().users().in().following();
-    
-    assert.equal(renderChain(chain), `g.V().hasLabel('user').in().out('follows')`);
+
+    assert.equal(
+      renderChain(chain),
+      `g.V().hasLabel('user').in().out('follows')`,
+    );
   });
 
-  it('should render a chain with only generic steps', () => {
-
-  });
+  it('should render a chain with only generic steps', () => {});
 
   it.skip('should accept custom steps as arguments', () => {
     const chain = g.V().repeat(out()).until(named('Alice'));
 
-    assert.equal(renderChain(chain), `g.V().repeat(out()).until(has('name', 'Alice'))`);
+    assert.equal(
+      renderChain(chain),
+      `g.V().repeat(out()).until(has('name', 'Alice'))`,
+    );
   });
 });

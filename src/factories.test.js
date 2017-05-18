@@ -6,7 +6,6 @@ import type { ChainCreator } from './factories';
 import groovySyntax from './lang/groovy';
 import renderInline from './render/inline';
 
-
 describe('Steps', () => {
   it('should expose any step', () => {
     const { out } = groovy;
@@ -61,7 +60,7 @@ describe('groovy', () => {
     assert.isFunction(chain);
   });
 
-  it('should expose non-function chainable properties', function () {
+  it('should expose non-function chainable properties', function() {
     const { g } = groovy;
 
     const chain = g.has.duh.foo.baz;
@@ -112,7 +111,6 @@ describe('groovy', () => {
     assert.deepPropertyVal(repr1, '1.name', 'has');
     assert.deepPropertyVal(repr1, '2.params.0', 'firstname');
     assert.deepPropertyVal(repr1, '2.params.1', 'Alice');
-
 
     assert.isArray(repr2);
     assert.deepPropertyVal(repr2, '0.name', 'g');

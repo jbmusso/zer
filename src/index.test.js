@@ -2,9 +2,8 @@ import { assert } from 'chai';
 
 import { inspectChain, renderChain, groovy } from './';
 
-
 describe('inspectChain', () => {
-  it('should return the internal proxied Chain object', function () {
+  it('should return the internal proxied Chain object', function() {
     const { g } = groovy;
     const chain = inspectChain(g.V('name', 'Alice'));
 
@@ -19,7 +18,7 @@ describe('inspectChain', () => {
 });
 
 describe('renderChain', () => {
-  it('should return the proxied Chain representation', function () {
+  it('should return the proxied Chain representation', function() {
     const { g } = groovy;
     const chain = renderChain(g.V('name', 'Alice'));
 

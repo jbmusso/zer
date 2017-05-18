@@ -6,9 +6,8 @@ import { createChainBuilder, chainSymbol } from './chain-builder';
 import type { ChainCreator } from './factories';
 
 type DSL = {
-  [key: string]: (...args: Array<*>) => string
+  [key: string]: (...args: Array<*>) => string,
 };
-
 
 function wrapBuilder(builder, dsl: DSL) {
   return new Proxy(builder, {
@@ -42,10 +41,9 @@ function wrapBuilder(builder, dsl: DSL) {
       const toWrap = target(...args);
 
       return wrapBuilder(toWrap, dsl);
-    }
+    },
   });
 }
-
 
 export function createDsl(chainCreator: ChainCreator, dsl: DSL) {
   return new Proxy(chainCreator, {
@@ -53,6 +51,6 @@ export function createDsl(chainCreator: ChainCreator, dsl: DSL) {
       const builder = target[name];
 
       return wrapBuilder(builder, dsl);
-    }
+    },
   });
 }

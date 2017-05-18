@@ -16,7 +16,6 @@ export type ChainMember = {
   name: string,
 };
 
-
 export type Renderer<X> = (chain: Chain, syntax: Syntax) => Render<X>;
 
 export type Render<X> = X;

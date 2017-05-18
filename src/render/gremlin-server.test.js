@@ -6,7 +6,6 @@ import render from './gremlin-server';
 
 import groovySyntax from '../lang/groovy';
 
-
 describe('Serialization', () => {
   it('should return a string representation where primitives, objects and array are bound except other chains', () => {
     const chain = createChain()
@@ -27,13 +26,18 @@ describe('Serialization', () => {
       .addStep('has')
       .addArguments('name', 'Alice')
       .addStep('has')
-      .addArguments('age', 30)
+      .addArguments('age', 30);
 
     const repr = render(chain, groovySyntax);
 
     assert.isObject(repr);
     assert.equal(repr.query, `foo.has(p0, p1).has(p2, p3)`);
-    assert.deepEqual(repr.params, { p0: 'name', p1: 'Alice', p2: 'age', p3: 30 });
+    assert.deepEqual(repr.params, {
+      p0: 'name',
+      p1: 'Alice',
+      p2: 'age',
+      p3: 30,
+    });
   });
 
   it('should return a recursive string representation with all primitives bound', () => {
@@ -47,9 +51,7 @@ describe('Serialization', () => {
       .addArguments('age', 30)
       .addStep('repeat')
       .addArguments(
-        createChain()
-          .startWith('out')
-          .addArguments('firstname', 'Bob')
+        createChain().startWith('out').addArguments('firstname', 'Bob'),
       );
 
     const repr = render(chain, groovySyntax);
@@ -61,6 +63,9 @@ describe('Serialization', () => {
     assert.deepPropertyVal(repr, 'params.p4', 'firstname');
     assert.deepPropertyVal(repr, 'params.p5', 'Bob');
 
-    assert.equal(repr.query, `g.V().has(p0, p1).has(p2, p3).repeat(out(p4, p5))`)
+    assert.equal(
+      repr.query,
+      `g.V().has(p0, p1).has(p2, p3).repeat(out(p4, p5))`,
+    );
   });
 });

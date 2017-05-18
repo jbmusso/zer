@@ -19,8 +19,11 @@ export type ChainBuilder = Proxy<Function>;
  *    foo.bar()
  *    foo.bar(...args);
  */
-export function createChainBuilder(chain: Chain, render: Renderer<Render<*>>, syntax: Syntax): ChainBuilder {
-
+export function createChainBuilder(
+  chain: Chain,
+  render: Renderer<Render<*>>,
+  syntax: Syntax,
+): ChainBuilder {
   const handlers = createProxyHandlers(chain, render, syntax);
 
   const builder = new Proxy(() => {}, {
@@ -45,11 +48,11 @@ export function createChainBuilder(chain: Chain, render: Renderer<Render<*>>, sy
       chain.addArguments(...args);
 
       return builder;
-    }
+    },
   });
 
   return builder;
-};
+}
 
 export const inspectSymbol: Symbol = Symbol('inspect');
 export const renderSymbol: Symbol = Symbol('render');
@@ -57,7 +60,11 @@ export const chainSymbol: Symbol = Symbol('chain');
 export const rendererSymbol: Symbol = Symbol('renderFunction');
 export const syntaxSymbol: Symbol = Symbol('syntax');
 
-function createProxyHandlers(chain: Chain, render: Renderer<Render<*>>, syntax: Syntax): any {
+function createProxyHandlers(
+  chain: Chain,
+  render: Renderer<Render<*>>,
+  syntax: Syntax,
+): any {
   const handlers = {
     [inspectSymbol](): Array<ChainMember> {
       return chain.members;
@@ -87,7 +94,7 @@ function createProxyHandlers(chain: Chain, render: Renderer<Render<*>>, syntax: 
     },
     [Symbol.toStringTag](): Renderer<Render<string>> {
       return (): Render<string> => render(chain, syntax);
-    }
+    },
   };
 
   return handlers;

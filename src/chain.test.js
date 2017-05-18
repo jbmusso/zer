@@ -2,8 +2,6 @@ import { assert } from 'chai';
 
 import { createChain } from './chain';
 
-
-
 describe('Chain', () => {
   it('should expose a factory', () => {
     assert.isFunction(createChain);
@@ -18,14 +16,11 @@ describe('Chain', () => {
   });
 
   it('should chain steps', () => {
-    const chain = createChain()
-      .addStep('foo')
-      .addStep('bar');
+    const chain = createChain().addStep('foo').addStep('bar');
 
     assert.lengthOf(chain.members, 2);
     assert.deepPropertyVal(chain, 'members.0.name', 'foo');
     assert.deepPropertyVal(chain, 'members.1.name', 'bar');
-
   });
 
   it('should chain arguments', () => {
@@ -42,15 +37,9 @@ describe('Chain', () => {
   });
 
   it('should concatenate a chain with another', () => {
-    const chain1 = createChain()
-      .startWith('g')
-      .addStep('V')
-      .addArguments(1);
+    const chain1 = createChain().startWith('g').addStep('V').addArguments(1);
 
-    const chain2 = createChain()
-      .addStep('out')
-      .addArguments('knows');
-
+    const chain2 = createChain().addStep('out').addArguments('knows');
 
     chain1.append(chain2);
 
@@ -60,6 +49,5 @@ describe('Chain', () => {
     assert.deepPropertyVal(chain1, 'members.2.params.0', 1);
     assert.deepPropertyVal(chain1, 'members.3.name', 'out');
     assert.deepPropertyVal(chain1, 'members.4.params.0', 'knows');
-
   });
 });

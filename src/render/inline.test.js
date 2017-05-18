@@ -9,7 +9,6 @@ import renderInline from './inline';
 
 const groovy = createChainCreator(renderInline, groovySyntax);
 
-
 describe('Serialization', () => {
   it('should serialize a single function call', () => {
     const { g } = groovy;
@@ -26,7 +25,7 @@ describe('Serialization', () => {
     const chain1 = g.has('firstname', 'Alice').out('knows');
     const groovyString = chain1.toString();
 
-    assert.equal(groovyString, "g.has('firstname', 'Alice').out('knows')")
+    assert.equal(groovyString, "g.has('firstname', 'Alice').out('knows')");
   });
 
   it('should serialize chain arguments', () => {
@@ -58,11 +57,7 @@ describe('Serialization', () => {
       .addStep('has')
       .addArguments('name', 'Alice')
       .addStep('repeat')
-      .addArguments(
-        createChain()
-          .startWith('out')
-          .addArguments('name', 'Bob')
-      );
+      .addArguments(createChain().startWith('out').addArguments('name', 'Bob'));
 
     const repr = renderInline(chain, groovySyntax);
 

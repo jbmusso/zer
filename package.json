@@ -5,11 +5,19 @@
   "main": "lib/index.js",
   "scripts": {
     "prebuild": "rimraf lib",
+    "precommit": "lint-staged",
     "build": "babel -d lib --ignore *.test.js src",
     "build:watch": "npm run build -- --watch",
     "postinstall": "postinstall-build lib",
+    "prettify": "prettier --single-quote --trailing-comma all --write \"src/**/*.js\"",
     "test": "mocha $(find src -path '*test.js') --compilers js:babel-register --recursive --reporter spec",
     "test:watch": "npm run test -- --watch"
+  },
+  "lint-staged": {
+    "*.js": [
+      "npm run prettify",
+      "git add"
+    ]
   },
   "dependencies": {
     "postinstall-build": "^5.0.0"
@@ -26,7 +34,10 @@
     "eslint-plugin-flowtype": "^2.30.0",
     "eslint-plugin-flowtype-errors": "^3.0.0",
     "flow-bin": "^0.46.0",
+    "husky": "^0.13.3",
+    "lint-staged": "^3.4.2",
     "mocha": "^2.4.5",
+    "prettier": "^1.3.1",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.1"
   },

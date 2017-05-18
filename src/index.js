@@ -7,16 +7,27 @@ import groovySyntax from './lang/groovy';
 import renderInline from './render/inline';
 import gremlinEscaper from './render/gremlin-server';
 
-import { inspectSymbol, renderSymbol, chainSymbol, rendererSymbol, syntaxSymbol } from './chain-builder';
+import {
+  inspectSymbol,
+  renderSymbol,
+  chainSymbol,
+  rendererSymbol,
+  syntaxSymbol,
+} from './chain-builder';
 
 import type { Render, ChainMember } from './types';
 import type { ChainCreator } from './factories';
 import type { ChainBuilder } from './chain-builder';
 import type { Chain } from './chain';
 
-export const groovy: ChainCreator = createChainCreator(renderInline, groovySyntax);
-export const gremlin: ChainCreator = createChainCreator(gremlinEscaper, groovySyntax);
-
+export const groovy: ChainCreator = createChainCreator(
+  renderInline,
+  groovySyntax,
+);
+export const gremlin: ChainCreator = createChainCreator(
+  gremlinEscaper,
+  groovySyntax,
+);
 
 export function inspectChain(chainProxy: ChainBuilder): Array<ChainMember> {
   return chainProxy[inspectSymbol];

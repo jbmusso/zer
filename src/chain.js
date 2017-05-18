@@ -29,7 +29,6 @@ class Step extends ChainMember {
   }
 }
 
-
 export class Arguments extends ChainMember {
   params: Array<any>;
 
@@ -41,7 +40,7 @@ export class Arguments extends ChainMember {
 }
 
 export class Chain {
-  members: Array<ChainMember>
+  members: Array<ChainMember>;
 
   constructor() {
     this.members = [];
