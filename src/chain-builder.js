@@ -87,9 +87,6 @@ function createProxyHandlers(chain: Chain, render: Renderer<Render<*>>, syntax: 
     },
     [Symbol.toStringTag](): Renderer<Render<string>> {
       return (): Render<string> => render(chain, syntax);
-    },
-    __repr__(): Function {
-      return (): Array<ChainMember> => chain.members;
     }
   };
 

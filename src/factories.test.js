@@ -1,56 +1,45 @@
 /* @flow */
 import { assert } from 'chai';
 
-import { createChainCreator } from './';
+import { createChainCreator, inspectChain, groovy } from './';
 import type { ChainCreator } from './factories';
 import groovySyntax from './lang/groovy';
 import renderInline from './render/inline';
 
-const Objects: ChainCreator = createChainCreator(renderInline, groovySyntax);
-
 
 describe('Steps', () => {
   it('should expose any step', () => {
-    const { out } = Objects;
+    const { out } = groovy;
     const chain = out;
 
     assert.isFunction(chain);
   });
 
   it('should expose callable steps', () => {
-    const { out } = Objects;
+    const { out } = groovy;
     const chain = out();
 
     assert.isFunction(chain);
   });
 
   it('should expose steps callable with arguments', () => {
-    const { out } = Objects;
+    const { out } = groovy;
     const chain = out('firstname', 'Alice');
 
     assert.isFunction(chain);
   });
-
-  it.skip('should expose steps callable with arguments and the proper __repr__()', () => {
-    const { out } = Objects;
-    const repr = out('firstname', 'Alice').__repr__();
-
-    assert.deepPropertyVal(repr, '0.name', 'out');
-    assert.deepPropertyVal(repr, '1.params.0', 'firstname');
-    assert.deepPropertyVal(repr, '1.params.1', 'Alice');
-  });
 });
 
-describe('Objects', () => {
+describe('groovy', () => {
   it('should expose any object', () => {
-    const { g } = Objects;
+    const { g } = groovy;
     const chain = g;
 
     assert.isFunction(chain);
   });
 
   it('should expose any step', () => {
-    const { g } = Objects;
+    const { g } = groovy;
 
     const chain = g.has;
 
@@ -58,7 +47,7 @@ describe('Objects', () => {
   });
 
   it('should expose callable steps', () => {
-    const { g } = Objects;
+    const { g } = groovy;
 
     const chain = g.has();
 
@@ -66,14 +55,14 @@ describe('Objects', () => {
   });
 
   it('should expose callable steps', () => {
-    const { g } = Objects;
+    const { g } = groovy;
     const chain = g.has('firstname', 'Alice');
 
     assert.isFunction(chain);
   });
 
   it('should expose non-function chainable properties', function () {
-    const { g } = Objects;
+    const { g } = groovy;
 
     const chain = g.has.duh.foo.baz;
 
@@ -81,21 +70,21 @@ describe('Objects', () => {
   });
 
   it('should expose chainable steps', () => {
-    const { g } = Objects;
+    const { g } = groovy;
     const chain = g.has().out();
 
     assert.isFunction(chain);
   });
 
   it('should expose chainable-callable steps', () => {
-    const { g } = Objects;
+    const { g } = groovy;
     const chain = g.has.out();
 
     assert.isFunction(chain);
   });
 
   it('should expose infinitely chainable steps', () => {
-    const { g } = Objects;
+    const { g } = groovy;
 
     const chain = g.has().out().in.foo.bar();
 
@@ -103,50 +92,20 @@ describe('Objects', () => {
   });
 
   it('should support arguments', () => {
-    const { g } = Objects;
+    const { g } = groovy;
     const chain = g.has('firstname', 'Alice');
 
     assert.isFunction(chain);
   });
 
-  it('should return an abstract chain representation object', () => {
-    const { g } = Objects;
-    const chain = g.has('firstname', 'Alice');
-    const repr = chain.__repr__();
-
-    assert.isArray(repr);
-    assert.equal(repr.length, '3')
-  });
-
-  it('should be an Array', () => {
-    const { g } = Objects;
-    const repr = g.has('firstname').__repr__();
-    assert.isArray(repr);
-  });
-
-  it('should return the correct representation for chained steps', () => {
-    const { g } = Objects;
-    const chain = g.has('firstname', 'Alice').out('knows');
-    const repr = chain.__repr__();
-
-    assert.lengthOf(repr, 5);
-
-    assert.deepPropertyVal(repr, '0.name', 'g');
-    assert.deepPropertyVal(repr, '1.name', 'has');
-    assert.deepPropertyVal(repr, '2.params.0', 'firstname');
-    assert.deepPropertyVal(repr, '2.params.1', 'Alice');
-    assert.deepPropertyVal(repr, '3.name', 'out');
-    assert.deepPropertyVal(repr, '4.params.0', 'knows');
-  });
-
   it('should not conflict when creating multiple chains', () => {
-    const { g } = Objects;
+    const { g } = groovy;
 
     const chain1 = g.has('firstname', 'Alice');
     const chain2 = g.out('knows');
 
-    const repr1 = chain1.__repr__();
-    const repr2 = chain2.__repr__();
+    const repr1 = inspectChain(chain1);
+    const repr2 = inspectChain(chain2);
 
     assert.isArray(repr1);
     assert.deepPropertyVal(repr1, '0.name', 'g');

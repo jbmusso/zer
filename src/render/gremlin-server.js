@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { createChainCreator } from '../factories';
 import { Chain } from '../chain';
 import type { Syntax } from '../types';
+import { inspectChain } from '../';
 
 
 const GROOVY_FORMAT_NORMAL = {
@@ -21,7 +22,7 @@ function renderArgument(argument, syntax, nameIdentifier, boundAcc) {
   if (typeof argument === 'function') {
     // TODO: cleanup dirty hack and make sure argument is an instance of
     // Chain rather than a function
-    return render({ members: argument.__repr__() }, syntax, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
+    return render({ members: inspectChain(argument) }, syntax, nameIdentifier, { query: '', params: {}, offset: boundAcc.offset });
   }
 
   // Argument is a Primitive and can be safely escaped/bound.

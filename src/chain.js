@@ -71,10 +71,6 @@ export class Chain {
     this.members = [...this.members, new PropertyAccessor(), ...chain.members];
     return this;
   }
-
-  __repr__(): Array<ChainMember> {
-    return this.members;
-  }
 }
 
 // TODO: missing name argument here?
