@@ -1,34 +1,23 @@
 /* @flow */
 import { assert } from 'chai';
 
-import { createChain } from '../chain';
-import render from './gremlin-server';
+import { renderChain, gremlin } from '../';
 
-import groovySyntax from '../lang/groovy';
-
-describe('Serialization', () => {
+describe('Render: Gremlin Server', () => {
   it('should return a string representation where primitives, objects and array are bound except other chains', () => {
-    const chain = createChain()
-      .startWith('foo')
-      .addStep('bar')
-      .addArguments('name', 'Alice');
-
-    const repr = render(chain, groovySyntax);
+    const { foo } = gremlin;
+    const chain = foo.bar('name', 'Alice');
+    const repr = renderChain(chain);
 
     assert.isObject(repr);
     assert.equal(repr.query, `foo.bar(p0, p1)`);
     assert.deepEqual(repr.params, { p0: 'name', p1: 'Alice' });
   });
 
-  it('should propagate offset', () => {
-    const chain = createChain()
-      .startWith('foo')
-      .addStep('has')
-      .addArguments('name', 'Alice')
-      .addStep('has')
-      .addArguments('age', 30);
-
-    const repr = render(chain, groovySyntax);
+  it('should propagate offsets', () => {
+    const { foo } = gremlin;
+    const chain = foo.has('name', 'Alice').has('age', 30);
+    const repr = renderChain(chain);
 
     assert.isObject(repr);
     assert.equal(repr.query, `foo.has(p0, p1).has(p2, p3)`);
@@ -41,20 +30,13 @@ describe('Serialization', () => {
   });
 
   it('should return a recursive string representation with all primitives bound', () => {
-    const chain = createChain()
-      .startWith('g')
-      .addStep('V')
-      .addArguments()
-      .addStep('has')
-      .addArguments('name', 'Alice')
-      .addStep('has')
-      .addArguments('age', 30)
-      .addStep('repeat')
-      .addArguments(
-        createChain().startWith('out').addArguments('firstname', 'Bob'),
-      );
-
-    const repr = render(chain, groovySyntax);
+    const { g, out } = gremlin;
+    const chain = g
+      .V()
+      .has('name', 'Alice')
+      .has('age', 30)
+      .repeat(out('firstname', 'Bob'));
+    const repr = renderChain(chain);
 
     assert.deepPropertyVal(repr, 'params.p0', 'name');
     assert.deepPropertyVal(repr, 'params.p1', 'Alice');

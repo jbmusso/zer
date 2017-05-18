@@ -6,10 +6,6 @@ import { Chain } from '../chain';
 import type { Syntax } from '../types';
 import { inspectChain } from '../';
 
-const GROOVY_FORMAT_NORMAL = {
-  ARGUMENT_SEPARATOR: ', ',
-};
-
 function renderArgument(argument, syntax, nameIdentifier, boundAcc) {
   // If Argument is a Chain, that chain needs to be escaped recursively
   // then merged back into the parent chain.

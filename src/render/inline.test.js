@@ -6,61 +6,48 @@ import { createChain } from '../chain';
 import { createChainCreator } from '../factories';
 import groovySyntax from '../lang/groovy';
 import renderInline from './inline';
+import { renderChain } from '../';
 
 const groovy = createChainCreator(renderInline, groovySyntax);
 
-describe('Serialization', () => {
+describe('Render: inline', () => {
   it('should serialize a single function call', () => {
     const { g } = groovy;
-
-    const chain1 = g.has('firstname', 'Alice');
+    const chain1 = g.V().has('firstname', 'Alice');
     const groovyString = chain1.toString();
 
-    assert.equal(groovyString, "g.has('firstname', 'Alice')");
+    assert.equal(groovyString, "g.V().has('firstname', 'Alice')");
   });
 
   it('should serialize multiple calls with arguments', () => {
     const { g } = groovy;
-
-    const chain1 = g.has('firstname', 'Alice').out('knows');
+    const chain1 = g.V().has('firstname', 'Alice').out('knows');
     const groovyString = chain1.toString();
 
-    assert.equal(groovyString, "g.has('firstname', 'Alice').out('knows')");
+    assert.equal(groovyString, "g.V().has('firstname', 'Alice').out('knows')");
   });
 
   it('should serialize chain arguments', () => {
     const { g, out } = groovy;
+    const chain1 = g.V().repeat(out('knows'));
+    const repr = renderChain(chain1);
 
-    const chain1 = g.repeat(out('knows'));
-
-    const groovyString = chain1.toString();
-
-    assert.equal(groovyString, "g.repeat(out('knows'))");
+    assert.equal(repr, "g.V().repeat(out('knows'))");
   });
 
   it('should serialize as a Groovy string', () => {
-    const chain = createChain()
-      .startWith('foo')
-      .addStep('bar')
-      .addArguments('name', 'Alice');
+    const { g } = groovy;
+    const chain = g.V().has('name', 'Alice');
+    const repr = renderChain(chain);
 
-    const repr = renderInline(chain, groovySyntax);
-
-    assert.equal(repr, `foo.bar('name', 'Alice')`);
+    assert.equal(repr, `g.V().has('name', 'Alice')`);
   });
 
   it('should return a nested string representation', () => {
-    const chain = createChain()
-      .startWith('g')
-      .addStep('V')
-      .addArguments()
-      .addStep('has')
-      .addArguments('name', 'Alice')
-      .addStep('repeat')
-      .addArguments(createChain().startWith('out').addArguments('name', 'Bob'));
+    const { g, out } = groovy;
+    const chain = g.V().has('name', 'Alice').repeat(out('knows'));
+    const repr = renderChain(chain);
 
-    const repr = renderInline(chain, groovySyntax);
-
-    assert.equal(repr, `g.V().has('name', 'Alice').repeat(out('name', 'Bob'))`);
+    assert.equal(repr, `g.V().has('name', 'Alice').repeat(out('knows'))`);
   });
 });
